@@ -1,0 +1,8 @@
+{
+  "short_name": "Wyvern 2",
+  "name": "Wyvern HTTP Botnet 2",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

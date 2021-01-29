@@ -1,0 +1,40 @@
+.rc-slider-tooltip {
+  background: $input-background !important;
+  color: $primary-color !important;
+  border: 1px solid $separator-color !important;
+  border-radius: $border-radius !important;
+  text-align: center !important;
+  top: 150% !important;
+  bottom: unset !important;
+  padding: 5px !important;
+  transform: translateX(-50%) !important;
+}
+
+.rc-slider-handle {
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 20px !important;
+  background: $foreground-color !important;
+  cursor: default !important;
+  border: 1px solid $separator-color !important;
+  box-shadow: initial !important;
+}
+
+.rc-slider-track,
+.rc-slider-rail,
+.rc-slider-step {
+  height: 7px !important;
+}
+
+.rc-slider-rail {
+  border: 1px solid $separator-color !important;
+  background: $foreground-color !important;
+}
+
+.rc-slider-handle {
+  margin-top: -7px !important;
+}
+
+.rc-slider-track {
+  background: $theme-color-1 !important;
+}

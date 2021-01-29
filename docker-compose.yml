@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  api-server:
+    build: ./api-server
+    depends_on: 
+      - cloudproxy
+  cloudproxy:
+    build: ./cloudproxy
+  web:
+    build: ./web
+    depends_on: 
+      - api-server
+    volumes: 
+      - .:/app
+  tor:
+    build: ./tor
+    command: tor
+    depends_on:
+      - web
