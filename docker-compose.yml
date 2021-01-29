@@ -11,8 +11,6 @@ services:
     build: ./web
     depends_on: 
       - api-server
-    volumes: 
-      - .:/app
   tor:
     build: ./tor
     command: tor
