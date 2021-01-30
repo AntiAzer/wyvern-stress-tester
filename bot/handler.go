@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"os/user"
 	"strings"
 	"time"
@@ -88,7 +89,9 @@ func (h *Handler) Do(userAgent, proxy string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(jsonResponse)
+	if jsonResponse.Code == http.StatusForbidden {
+		os.Exit(0)
+	}
 
 	for _, task := range jsonResponse.Tasks {
 		go ParseTask(task)
