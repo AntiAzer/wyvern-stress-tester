@@ -25,7 +25,7 @@ type Handler struct {
 func (h *Handler) Init(config Config) error {
 	h.config = config
 
-	err := h.GeknockJSON.IPtIP()
+	err := h.GetIP()
 	if err != nil {
 		return err
 	}

@@ -33,7 +33,7 @@ func main() {
 
 	var config Config
 	var persistence Persistence
-	err := config.Init()
+	err = config.Init()
 	if err != nil {
 		return
 	}
