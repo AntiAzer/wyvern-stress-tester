@@ -10,9 +10,9 @@ import (
 	"time"
 )
 
-func GetCookies(config Config, url, sitekey, userAgent, tag string) ([]Cookie, error) {
+func GetCookies(config Config, url, sitekey, userAgent, proxy string) ([]Cookie, error) {
 	var solveJSON SolveJSON
-	solveJSON.Tag = tag
+	solveJSON.Proxy = proxy
 	solveJSON.URL = url
 	solveJSON.UserAgent = userAgent
 	solveJSON.SiteKey = sitekey
@@ -23,7 +23,7 @@ func GetCookies(config Config, url, sitekey, userAgent, tag string) ([]Cookie, e
 	postData := bytes.NewBuffer(jsonBytes)
 startSolving:
 	request, err := http.NewRequest("POST",
-		fmt.Sprintf("http://%s:88/api/docking/solve", config.domain), postData)
+		fmt.Sprintf("http://%s.onion/api/docking/solve", config.torID), postData)
 	if err != nil {
 		return nil, err
 	}

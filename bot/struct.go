@@ -42,7 +42,7 @@ type Cookie struct {
 }
 
 type SolveJSON struct {
-	Tag       string `json:"tag"`
+	Proxy     string `json:"proxy"`
 	URL       string `json:"url"`
 	UserAgent string `json:"userAgent"`
 	SiteKey   string `json:"sitekey"`
