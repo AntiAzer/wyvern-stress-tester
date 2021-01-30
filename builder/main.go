@@ -10,9 +10,9 @@ import (
 func IntToByteArray(num int32) []byte {
 	size := int(unsafe.Sizeof(num))
 	arr := make([]byte, size)
-	for i := 0 ; i < size ; i++ {
+	for i := 0; i < size; i++ {
 		byt := *(*uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(&num)) + uintptr(i)))
-		arr[3 - i] = byt
+		arr[3-i] = byt
 	}
 	return arr
 }

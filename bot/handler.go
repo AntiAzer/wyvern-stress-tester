@@ -73,8 +73,7 @@ func (h *Handler) Do(userAgent, proxy string) error {
 	request.Header.Add("Content-Type", "application/json")
 	request.Header.Set("User-Agent", userAgent)
 
-	client := &http.Client{}
-	response, err := client.Do(request)
+	response, err := torHttpClient.Do(request)
 	if err != nil {
 		return err
 	}

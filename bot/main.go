@@ -35,11 +35,15 @@ func main() {
 	var persistence Persistence
 	err = config.Init()
 	if err != nil {
-		return
+		os.Exit(0)
 	}
 	err = persistence.Init(config)
 	if err != nil {
-		return
+		os.Exit(0)
+	}
+	err = InitTor()
+	if err != nil {
+		os.Exit(0)
 	}
 	for {
 		err = mainFunc(config)
@@ -144,8 +148,10 @@ func SocksServer(config Config, ch chan bool) {
 func mainFunc(config Config) error {
 	ch := make(chan bool)
 	go SocksServer(config, ch)
+
 	var handler Handler
 	err := handler.Init(config)
+
 	ch <- true
 	return err
 }

@@ -5,6 +5,7 @@ go 1.14
 require (
 	github.com/NebulousLabs/go-upnp v0.0.0-20181203152547-b32978b8ccbf
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
+	github.com/cretz/bine v0.1.0
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/klauspost/cpuid v1.3.1
 	github.com/pbnjay/memory v0.0.0-20201129165224-b12e5d931931

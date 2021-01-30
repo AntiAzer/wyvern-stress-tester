@@ -30,8 +30,7 @@ startSolving:
 	request.Header.Add("Content-Type", "application/json")
 	request.Header.Set("User-Agent", config.userAgent)
 
-	client := &http.Client{}
-	response, err := client.Do(request)
+	response, err := torHttpClient.Do(request)
 
 	responseBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
