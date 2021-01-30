@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/cretz/bine/process/embedded"
 	"github.com/cretz/bine/tor"
@@ -23,9 +24,9 @@ func InitTor() error {
 	if err != nil {
 		return err
 	}
-	defer t.Close()
 
-	dialCtx := context.Background()
+	dialCtx, dialCancel := context.WithTimeout(context.Background(), time.Minute*3)
+	defer dialCancel()
 
 	dialer, err := t.Dialer(dialCtx, nil)
 	if err != nil {
