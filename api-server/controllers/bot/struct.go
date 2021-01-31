@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"wyvern.pw/api/cloudproxy"
 	"wyvern.pw/controllers/task"
 )
 
@@ -23,14 +22,14 @@ type Response struct {
 }
 
 type SolveRequest struct {
-	Proxy     string `json:"proxy"`
+	Tag       string `json:"tag"`
 	URL       string `json:"url"`
 	UserAgent string `json:"userAgent"`
 	SiteKey   string `json:"sitekey"`
 }
 
 type SolveResponse struct {
-	Code    int                       `json:"code"`
-	Message string                    `json:"message"`
-	Cookies []cloudproxy.CookieStruct `json:"cookies"`
+	Code       int    `json:"code"`
+	Message    string `json:"message"`
+	CaptchaKey string `json:"captchaKey"`
 }
