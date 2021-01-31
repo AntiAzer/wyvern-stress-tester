@@ -11,7 +11,7 @@ func CheckUserToken(c *gin.Context) {
 	token := c.GetHeader("Token")
 	authSuccess, err := cAuth.CheckToken(token)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, cAuth.Response{
+		c.JSON(http.StatusOK, cAuth.Response{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		})
@@ -21,7 +21,7 @@ func CheckUserToken(c *gin.Context) {
 	if authSuccess {
 		c.Next()
 	} else {
-		c.JSON(http.StatusUnauthorized, cAuth.Response{
+		c.JSON(http.StatusOK, cAuth.Response{
 			Code:    http.StatusUnauthorized,
 			Message: "Wrong Authorization.",
 		})

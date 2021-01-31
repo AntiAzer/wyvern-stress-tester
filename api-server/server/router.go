@@ -55,7 +55,6 @@ func getRouter() *gin.Engine {
 
 			docking.POST("/knock", cBot.ParseKnock)       // default knock
 			docking.POST("/captcha", cBot.SolveChallenge) // anti captcha
-			docking.GET("/stuff")                         // serve node and cloudproxy files
 		}
 	}
 

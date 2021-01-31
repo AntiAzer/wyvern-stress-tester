@@ -13,7 +13,7 @@ func UpdateSetting(c *gin.Context) {
 	var request UpdateRequest
 	err := c.BindJSON(&request)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		})
@@ -23,7 +23,7 @@ func UpdateSetting(c *gin.Context) {
 
 	db, err := data.GetConnection()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		})
@@ -39,7 +39,7 @@ func UpdateSetting(c *gin.Context) {
 			request.Value, request.Name)
 	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		})

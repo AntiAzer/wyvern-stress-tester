@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS "attack" (
 INSERT INTO "setting" VALUES ('user-agent','MY_USER_AGENT');
 INSERT INTO "setting" VALUES ('interval','60');
 INSERT INTO "setting" VALUES ('api-key','API_KEY');
+INSERT INTO "setting" VALUES ('ip','1.1.1.1');
 INSERT INTO "auth" VALUES ('353ba90f8c0b3e0f355a3d6c960b7caed5f2c1412992277c0669a04a62e7dfd35fba9f4631a7dc6d00fb44d93d305cc0b749c7501d9ce86f26148d05101b8324');
 COMMIT;
 `)

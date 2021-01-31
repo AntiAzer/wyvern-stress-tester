@@ -78,7 +78,7 @@ func GetBotStatus(c *gin.Context) {
 		c.Abort()
 		return
 	default:
-		c.JSON(http.StatusBadRequest, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:  http.StatusBadRequest,
 			Value: "Wrong status type.",
 		})
@@ -90,7 +90,7 @@ func GetBotStatus(c *gin.Context) {
 func GetBotList(c *gin.Context) {
 	botList, err := getBotList()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:  http.StatusInternalServerError,
 			Value: err.Error(),
 		})

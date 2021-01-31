@@ -9,7 +9,7 @@ func Check(c *gin.Context) {
 	var request Request
 	err := c.BindJSON(&request)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		})
@@ -18,7 +18,7 @@ func Check(c *gin.Context) {
 	}
 	authSuccess, err := CheckToken(request.Token)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		})
@@ -33,7 +33,7 @@ func Check(c *gin.Context) {
 		c.Abort()
 		return
 	} else {
-		c.JSON(http.StatusUnauthorized, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:    http.StatusUnauthorized,
 			Message: "Invalid token.",
 		})
@@ -46,7 +46,7 @@ func Login(c *gin.Context) {
 	var request Request
 	err := c.BindJSON(&request)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		})
@@ -55,7 +55,7 @@ func Login(c *gin.Context) {
 	}
 	authSuccess, err := checkPassword(request.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		})
@@ -65,7 +65,7 @@ func Login(c *gin.Context) {
 	if authSuccess {
 		tokenString, err := generateToken(request.Password)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, Response{
+			c.JSON(http.StatusOK, Response{
 				Code:    http.StatusInternalServerError,
 				Message: err.Error(),
 			})
@@ -79,7 +79,7 @@ func Login(c *gin.Context) {
 		c.Abort()
 		return
 	} else {
-		c.JSON(http.StatusUnauthorized, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:    http.StatusUnauthorized,
 			Message: "Invalid password!",
 		})

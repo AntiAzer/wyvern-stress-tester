@@ -18,7 +18,7 @@ func GetServerStatus(c *gin.Context) {
 	case "cpu":
 		before, err := cpu.Get()
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, Response{
+			c.JSON(http.StatusOK, Response{
 				Code:  http.StatusInternalServerError,
 				Value: err.Error(),
 			})
@@ -28,7 +28,7 @@ func GetServerStatus(c *gin.Context) {
 		time.Sleep(time.Duration(1) * time.Second)
 		after, err := cpu.Get()
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, Response{
+			c.JSON(http.StatusOK, Response{
 				Code:  http.StatusInternalServerError,
 				Value: err.Error(),
 			})
@@ -45,7 +45,7 @@ func GetServerStatus(c *gin.Context) {
 	case "ram":
 		memory, err := memory.Get()
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, Response{
+			c.JSON(http.StatusOK, Response{
 				Code:  http.StatusInternalServerError,
 				Value: err.Error(),
 			})
@@ -74,7 +74,7 @@ func GetServerStatus(c *gin.Context) {
 		c.Abort()
 		return
 	default:
-		c.JSON(http.StatusBadRequest, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:  http.StatusBadRequest,
 			Value: "Wrong status type.",
 		})

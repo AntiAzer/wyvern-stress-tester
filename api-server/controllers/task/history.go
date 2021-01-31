@@ -16,7 +16,7 @@ func GetHistory(c *gin.Context) {
 		if err != nil {
 			if err != nil {
 				fmt.Println(err)
-				c.JSON(http.StatusInternalServerError, Response{
+				c.JSON(http.StatusOK, Response{
 					Code:    http.StatusInternalServerError,
 					Message: err.Error(),
 				})
@@ -35,7 +35,7 @@ func GetHistory(c *gin.Context) {
 		tasks, err := GetTasks()
 		if err != nil {
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, Response{
+				c.JSON(http.StatusOK, Response{
 					Code:    http.StatusInternalServerError,
 					Message: err.Error(),
 				})
@@ -51,7 +51,7 @@ func GetHistory(c *gin.Context) {
 		c.Abort()
 		return
 	default:
-		c.JSON(http.StatusBadRequest, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:    http.StatusBadRequest,
 			Message: "Wrong task type.",
 		})

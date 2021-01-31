@@ -14,7 +14,7 @@ func CreateTask(c *gin.Context) {
 		var attack Attack
 		err := c.BindJSON(&attack)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, Response{
+			c.JSON(http.StatusOK, Response{
 				Code:    http.StatusInternalServerError,
 				Message: err.Error(),
 			})
@@ -23,7 +23,7 @@ func CreateTask(c *gin.Context) {
 		}
 		err = createAttack(attack)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, Response{
+			c.JSON(http.StatusOK, Response{
 				Code:    http.StatusInternalServerError,
 				Message: err.Error(),
 			})
@@ -40,7 +40,7 @@ func CreateTask(c *gin.Context) {
 		var task Task
 		err := c.BindJSON(&task)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, Response{
+			c.JSON(http.StatusOK, Response{
 				Code:    http.StatusInternalServerError,
 				Message: err.Error(),
 			})
@@ -49,7 +49,7 @@ func CreateTask(c *gin.Context) {
 		}
 		err = createTask(task)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, Response{
+			c.JSON(http.StatusOK, Response{
 				Code:    http.StatusInternalServerError,
 				Message: err.Error(),
 			})
@@ -63,7 +63,7 @@ func CreateTask(c *gin.Context) {
 		c.Abort()
 		return
 	default:
-		c.JSON(http.StatusBadRequest, Response{
+		c.JSON(http.StatusOK, Response{
 			Code:    http.StatusBadRequest,
 			Message: "Wrong task type.",
 		})
