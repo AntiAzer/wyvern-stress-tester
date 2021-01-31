@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"api/anticaptcha"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -22,7 +23,6 @@ func SolveChallenge(c *gin.Context) {
 		c.JSON(http.StatusTooManyRequests, SolveResponse{
 			Code:    http.StatusTooManyRequests,
 			Message: "Wait some times...",
-			Cookies: nil,
 		})
 		c.Abort()
 		return
@@ -36,7 +36,6 @@ func SolveChallenge(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, SolveResponse{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
-			Cookies: nil,
 		})
 		c.Abort()
 		return
@@ -48,27 +47,16 @@ func SolveChallenge(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, SolveResponse{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
-			Cookies: nil,
 		})
 		c.Abort()
 		return
 	}
-	cookies, err := cloudproxy.GetCookie(request.URL, request.Proxy, request.UserAgent, request.SiteKey, apiKey)
-	if err != nil {
-		currentWorker--
-		c.JSON(http.StatusInternalServerError, SolveResponse{
-			Code:    http.StatusInternalServerError,
-			Message: err.Error(),
-			Cookies: nil,
-		})
-		c.Abort()
-		return
-	}
+	captchaKey, err := anticaptcha.SolveCaptcha()
 	currentWorker--
 	c.JSON(http.StatusOK, SolveResponse{
 		Code:    http.StatusOK,
 		Message: "",
-		Cookies: cookies,
+		CaptchaKey: captchaKey,
 	})
 	c.Abort()
 	return
