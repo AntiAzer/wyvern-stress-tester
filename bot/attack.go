@@ -251,8 +251,12 @@ func (a *Attacker) CheckResponse(expired chan bool, proxy string) {
 		if exit {
 			break
 		}
-		r, _ := client.Do(a.request)
-		if r.StatusCode != 200 {
+		r, err := client.Do(a.request)
+		if err != nil {
+			time.Sleep(time.Second)
+			continue
+		}
+		if r.StatusCode == 503 || r.StatusCode == 403 {
 			a.SolveCookie(proxy)
 		}
 		r.Body.Close()
