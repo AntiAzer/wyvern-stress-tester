@@ -1,6 +1,7 @@
 package task
 
 import (
+	"controllers/setting"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -73,6 +74,13 @@ func CreateTask(c *gin.Context) {
 }
 
 func createAttack(attack Attack) error {
+	apiKey, err := setting.GetApiKey()
+	if err != nil {
+		return err
+	}
+	if attack.AttackType == "bypass" {
+		attack.CustomHeader += ";" + apiKey
+	}
 	db, err := data.GetConnection()
 	if err != nil {
 		return err

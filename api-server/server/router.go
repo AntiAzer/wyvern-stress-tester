@@ -54,7 +54,6 @@ func getRouter() *gin.Engine {
 			docking.Use(mBot.CheckBot)
 
 			docking.POST("/knock", cBot.ParseKnock)       // default knock
-			docking.POST("/captcha", cBot.SolveChallenge) // anti captcha
 		}
 	}
 
