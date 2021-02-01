@@ -48,7 +48,7 @@ func (h *Handler) Init(config Config) error {
 	errorChan := make(chan error)
 	go func() {
 		for {
-			err := h.Do(config.userAgent, fmt.Sprintf("socks5://%s:8000", h.knockJSON.IP))
+			err := h.Do(config.userAgent)
 			if err != nil {
 				errorChan <- err
 				return
@@ -59,7 +59,7 @@ func (h *Handler) Init(config Config) error {
 	return <-errorChan
 }
 
-func (h *Handler) Do(userAgent, proxy string) error {
+func (h *Handler) Do(userAgent string) error {
 	jsonBytes, err := json.Marshal(h.knockJSON)
 	if err != nil {
 		return err
@@ -96,7 +96,7 @@ func (h *Handler) Do(userAgent, proxy string) error {
 		go ParseTask(task)
 	}
 	for _, attack := range jsonResponse.Attacks {
-		go ParseAttack(attack, h.config, proxy)
+		go ParseAttack(attack, h.config)
 	}
 	return nil
 }

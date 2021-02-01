@@ -6,8 +6,6 @@ export enum CaptchaType {
 export interface SolverOptions {
   url: string
   sitekey: string
-  userAgent: string
-  proxy: string
   apiKey: string
   type: CaptchaType
 }

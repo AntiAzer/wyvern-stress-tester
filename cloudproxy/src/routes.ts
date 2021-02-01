@@ -210,8 +210,6 @@ async function resolveChallenge(ctx: RequestContext, { url, userAgent, maxTimeou
           const token = await captchaSolver({
             url,
             sitekey,
-            userAgent,
-            proxy,
             apiKey,
             type: captchaType
           })

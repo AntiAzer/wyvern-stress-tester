@@ -1,6 +1,6 @@
 let requests = 0
 
-const LOG_HTML: boolean = Boolean(process.env.LOG_HTML) || false
+const LOG_HTML: boolean = false
 
 export default {
   incRequests: () => { requests++ },
@@ -10,7 +10,7 @@ export default {
   },
   ...require('console-log-level')(
     {
-      level: process.env.LOG_LEVEL || 'debug',
+      level: 'error',
       prefix(level: string) {
         return `${new Date().toISOString()} ${level.toUpperCase()} REQ-${requests}`
       }
