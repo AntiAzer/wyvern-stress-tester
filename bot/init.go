@@ -1,16 +1,11 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"syscall"
 
-	"github.com/gin-gonic/gin"
 	"github.com/artdarek/go-unzip"
 )
 
@@ -83,54 +78,6 @@ func SetupDir(publicDir string) (bool, error) {
 		}
 	}
 	return false, nil
-}
-
-func InitTorReverseProxy(config Config) {
-	go func() {
-		r := gin.New()
-		r.Use(gin.Recovery())
-		r.POST("/captcha", func(c *gin.Context) {
-			var request CaptchaRequest
-			err := c.BindJSON(&request)
-			if err != nil {
-				c.String(http.StatusInternalServerError, err.Error())
-				c.Abort()
-				return
-			}
-
-			requestBytes, err := json.Marshal(request)
-			if err != nil {
-				c.String(http.StatusInternalServerError, err.Error())
-				c.Abort()
-				return
-			}
-			requestBuffer := bytes.NewBuffer(requestBytes)
-			resp, err := torHttpClient.Post(fmt.Sprintf("http://%s.onion/api/docking/captcha", config.torID),
-				"application/json", requestBuffer)
-			if err != nil {
-				c.String(http.StatusInternalServerError, err.Error())
-				c.Abort()
-				return
-			}
-			defer resp.Body.Close()
-
-			var response CaptchaResponse
-			responseBytes, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				c.String(http.StatusInternalServerError, err.Error())
-				c.Abort()
-				return
-			}
-			err = json.Unmarshal(responseBytes, &response)
-			if err != nil {
-				c.String(http.StatusInternalServerError, err.Error())
-				c.Abort()
-				return
-			}
-			c.JSON(http.StatusOK, response)
-		})
-		r.Run("localhost:8855")
-	}()
 }
 
 func Unzip(zipPath string) (string, error) {
