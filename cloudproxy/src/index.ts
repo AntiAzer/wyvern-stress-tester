@@ -5,7 +5,7 @@ import Router, { BaseAPICall } from './routes'
 
 const version: string = require('../package.json').version
 const serverPort: number = 8082
-const serverHost: string = '0.0.0.0'
+const serverHost: string = 'localhost'
 
 
 function errorResponse(errorMsg: string, res: ServerResponse, startTimestamp: number) {
