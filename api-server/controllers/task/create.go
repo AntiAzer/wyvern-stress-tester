@@ -1,11 +1,11 @@
 package task
 
 import (
-	"controllers/setting"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"wyvern.pw/data"
+	"wyvern.pw/controllers/setting"
 )
 
 func CreateTask(c *gin.Context) {
