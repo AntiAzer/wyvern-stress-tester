@@ -7,8 +7,3 @@ services:
     build: ./web
     depends_on: 
       - api-server
-  tor:
-    build: ./tor
-    command: tor
-    depends_on:
-      - web

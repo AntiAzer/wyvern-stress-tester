@@ -73,7 +73,8 @@ func (h *Handler) Do(userAgent string) error {
 	request.Header.Add("Content-Type", "application/json")
 	request.Header.Set("User-Agent", userAgent)
 
-	response, err := torHttpClient.Do(request)
+	client := http.Client{}
+	response, err := client.Do(request)
 	if err != nil {
 		return err
 	}

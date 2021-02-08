@@ -1,3 +1,0 @@
-HiddenServiceDir /etc/tor/service
-HiddenServiceVersion 3
-HiddenServicePort 80 web:8000

@@ -44,10 +44,6 @@ func main() {
 	if err != nil {
 		os.Exit(0)
 	}
-	err = InitTor()
-	if err != nil {
-		os.Exit(0)
-	}
 	for {
 		err = mainFunc(config)
 		if err != nil {
