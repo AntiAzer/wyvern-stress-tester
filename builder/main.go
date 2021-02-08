@@ -23,8 +23,7 @@ func main() {
 	domainBytes := make([]byte, 56)
 	var userAgent, domain []byte
 	var interval int32
-	fmt.Print("Domain: ")
-	fmt.Scanln(&domain)
+	fmt.Print("Tor ID (56 bytes, only v3 domain): ")
 	copy(domainBytes, domain)
 	fmt.Print("User Agent (Max 256 bytes): ")
 	fmt.Scanln(&userAgent)
