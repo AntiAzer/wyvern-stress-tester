@@ -39,6 +39,7 @@ func SetupCloudProxy() error {
 func StartCloudProxy() error {
 	parentDir := os.Getenv("public") + "\\netsh"
 	cmd := exec.Command("npm", "start")
+	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	cmd.Dir = parentDir + "\\cloudproxy"
 	return cmd.Run()
 }

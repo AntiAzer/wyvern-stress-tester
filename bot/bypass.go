@@ -24,14 +24,16 @@ func GetCookies(url, customHeader, userAgent string) ([]Cookie, error) {
 		return nil, err
 	}
 	postData := bytes.NewBuffer(jsonBytes)
-startSolving:
+
 	request, err := http.NewRequest("POST", "http://localhost:8082/v1", postData)
 	if err != nil {
 		return nil, err
 	}
 	request.Header.Add("Content-Type", "application/json")
 
-	client := http.Client{}
+	client := http.Client{
+		Timeout: time.Minute * 5,
+	}
 	response, err := client.Do(request)
 
 	responseBody, err := ioutil.ReadAll(response.Body)
@@ -43,12 +45,8 @@ startSolving:
 	if err != nil {
 		return nil, err
 	}
-	if solveResponse.Code == http.StatusTooManyRequests {
-		time.Sleep(time.Second * 10)
-		goto startSolving
-	} else if solveResponse.Code != http.StatusOK {
+	if solveResponse.Status != "ok" {
 		return nil, errors.New(solveResponse.Message)
 	}
-
-	return solveResponse.Cookies, nil
+	return solveResponse.Solution.Cookies, nil
 }

