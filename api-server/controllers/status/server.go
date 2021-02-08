@@ -9,7 +9,6 @@ import (
 	"github.com/mackerelio/go-osstat/cpu"
 	"github.com/mackerelio/go-osstat/memory"
 	"github.com/ricochet2200/go-disk-usage/du"
-	cBot "wyvern.pw/controllers/bot"
 )
 
 func GetServerStatus(c *gin.Context) {
@@ -69,7 +68,7 @@ func GetServerStatus(c *gin.Context) {
 	case "worker":
 		c.JSON(http.StatusOK, Response{
 			Code:  http.StatusOK,
-			Value: strconv.Itoa(cBot.GetCurrentWorker()),
+			Value: strconv.Itoa(0),
 		})
 		c.Abort()
 		return

@@ -104,29 +104,6 @@ const onAuthFormSubmit = (e) => {
   e.preventDefault();
 }
 
-const onSolverFormSubmit = (e) => {
-  const data = new FormData(e.target);
-  axios
-    .post('/api/setting/update', JSON.stringify({
-      name: 'ip',
-      value: data.get('ip')
-    }), {
-      headers: {
-        "Token": localStorage.getItem('token'),
-        "Content-Type": `application/json`,
-      },
-    })
-    .then((res) => {
-      if (res.data.code === 200) {
-        createNotification('success', null, 'Updated!', res.data.message);
-      }
-    })
-    .catch((error) => {
-      createNotification('error', null, "Failed!", error.response.data.message);
-    })
-  e.preventDefault();
-}
-
 const createNotification = (type, className, title, content) => {
   const cName = className || '';
   switch (type) {
@@ -284,33 +261,6 @@ const ServerDefault = ({ match }) => {
                     name="password"
                     id="password"
                     placeholder="THIS_IS_LONGEST_PASSWORD"
-                  />
-                </FormGroup>
-
-                <Button color="primary" className="mt-4">
-                  <IntlMessages id="forms.update" />
-                </Button>
-              </Form>
-            </CardBody>
-          </Card>
-        </Colxx>
-
-        <Colxx xxs="6">
-          <Card>
-            <CardBody>
-              <CardTitle>
-                <IntlMessages id="forms.server-ip" />
-              </CardTitle>
-              <Form onSubmit={onAuthFormSubmit}>
-                <FormGroup>
-                  <Label for="ip">
-                    <IntlMessages id="forms.ip" />
-                  </Label>
-                  <Input
-                    type="text"
-                    name="ip"
-                    id="ip"
-                    placeholder="1.1.1.1"
                   />
                 </FormGroup>
 
