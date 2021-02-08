@@ -58,7 +58,7 @@ func (a *Attacker) SolveCookie() error {
 	var err error
 	var cookies []Cookie
 	for i := 0; i < 3; i++ {
-		cookies, err = GetCookies(a.config, a.attack.TargetURL, a.attack.CustomHeader, a.userAgent)
+		cookies, err = GetCookies(a.attack.TargetURL, a.attack.CustomHeader, a.userAgent)
 		if err != nil {
 			fmt.Println(err)
 			time.Sleep(time.Second * 3)

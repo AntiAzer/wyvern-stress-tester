@@ -6,14 +6,19 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 )
 
-func GetCookies(config Config, url, sitekey, userAgent string) ([]Cookie, error) {
+func GetCookies(url, customHeader, userAgent string) ([]Cookie, error) {
+	splitedCustomHeader := strings.Split(customHeader, ";")
+
 	var solveJSON SolveJSON
+	solveJSON.Command = "request.get"
 	solveJSON.URL = url
 	solveJSON.UserAgent = userAgent
-	solveJSON.SiteKey = sitekey
+	solveJSON.SiteKey = splitedCustomHeader[0]
+	solveJSON.ApiKey = splitedCustomHeader[1]
 	jsonBytes, err := json.Marshal(solveJSON)
 	if err != nil {
 		return nil, err
@@ -25,9 +30,9 @@ startSolving:
 		return nil, err
 	}
 	request.Header.Add("Content-Type", "application/json")
-	request.Header.Set("User-Agent", config.userAgent)
 
-	response, err := torHttpClient.Do(request)
+	client := http.Client{}
+	response, err := client.Do(request)
 
 	responseBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {

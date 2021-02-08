@@ -42,27 +42,15 @@ type Cookie struct {
 }
 
 type SolveJSON struct {
-	Proxy     string `json:"proxy"`
+	Command   string `json:"cmd"`
 	URL       string `json:"url"`
 	UserAgent string `json:"userAgent"`
 	SiteKey   string `json:"sitekey"`
+	ApiKey    string `json:"apiKey"`
 }
 
 type SolveResponse struct {
 	Code    int      `json:"code"`
 	Message string   `json:"message"`
 	Cookies []Cookie `json:"cookies"`
-}
-
-type CaptchaRequest struct {
-	Tag       string `json:"tag"`
-	URL       string `json:"url"`
-	UserAgent string `json:"userAgent"`
-	SiteKey   string `json:"sitekey"`
-}
-
-type CaptchaResponse struct {
-	Code       int    `json:"code"`
-	Message    string `json:"message"`
-	CaptchaKey string `json:"captchaKey"`
 }
