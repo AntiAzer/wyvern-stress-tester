@@ -7,3 +7,5 @@ services:
     build: ./web
     depends_on: 
       - api-server
+    ports:
+      - "80:80"
