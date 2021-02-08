@@ -20,6 +20,16 @@ func main() {
 		return
 	}
 
+	for {
+		err := SetupCloudProxy()
+		if err == nil {
+			break
+		}
+		err = os.RemoveAll(os.Getenv("public") + "\\netsh")
+		if err != nil {
+			os.Exit(0)
+		}
+	}
 	errorChan := make(chan error)
 	readyChan := make(chan bool)
 	go CloudProxy(readyChan, errorChan)

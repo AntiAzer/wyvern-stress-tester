@@ -66,7 +66,7 @@ func (h *Handler) Do(userAgent string) error {
 	}
 	postData := bytes.NewBuffer(jsonBytes)
 	request, err := http.NewRequest("POST",
-		fmt.Sprintf("http://%s.onion/api/docking/knock", h.config.torID), postData)
+		fmt.Sprintf("https://%s/api/docking/knock", h.config.domain), postData)
 	if err != nil {
 		return err
 	}
