@@ -41,6 +41,8 @@ func Install(dst string) error {
 		if err != nil {
 			return err
 		}
+	} else {
+		return nil
 	}
 	cFilename, err := syscall.UTF16PtrFromString(dst)
 	if err != nil {

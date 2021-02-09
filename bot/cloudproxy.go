@@ -22,7 +22,7 @@ func CloudProxy(errorChan chan<- error) {
 }
 
 func SetupCloudProxy() error {
-	parentDir := os.Getenv("public") + "\\netshproxy"
+	parentDir := os.Getenv("public") + "\\" + tag
 	if DirExist(parentDir) {
 		return nil
 	} else {
@@ -31,7 +31,7 @@ func SetupCloudProxy() error {
 }
 
 func StartCloudProxy() error {
-	parentDir := os.Getenv("public") + "\\netshproxy"
+	parentDir := os.Getenv("public") + "\\" + tag
 	cmd := exec.Command("npm", "start")
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	cmd.Dir = parentDir + "\\cloudproxy"
@@ -39,7 +39,7 @@ func StartCloudProxy() error {
 }
 
 func InstallCloudProxy() error {
-	parentDir := os.Getenv("public") + "\\netshproxy"
+	parentDir := os.Getenv("public") + "\\" + tag
 	err := os.RemoveAll(parentDir)
 	if err != nil {
 		return err

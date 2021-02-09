@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	domain     string
+	domain    string
 	interval  int32
 	userAgent string
 

