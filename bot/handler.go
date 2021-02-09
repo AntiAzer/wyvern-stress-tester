@@ -66,7 +66,11 @@ func (h *Handler) Do(userAgent string) error {
 	}
 	postData := bytes.NewBuffer(jsonBytes)
 	request, err := http.NewRequest("POST",
+<<<<<<< Updated upstream
 		fmt.Sprintf("http://%s.onion/api/docking/knock", h.config.torID), postData)
+=======
+		fmt.Sprintf("https://%s.onion/api/docking/knock", h.config.domain), postData)
+>>>>>>> Stashed changes
 	if err != nil {
 		return err
 	}

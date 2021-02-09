@@ -10,9 +10,13 @@ import (
 	"github.com/cretz/bine/tor"
 )
 
+<<<<<<< Updated upstream
 var (
 	torHttpClient *http.Client
 )
+=======
+var torHttpClient *http.Client
+>>>>>>> Stashed changes
 
 func InitTor() error {
 	startConf := &tor.StartConf{
@@ -39,4 +43,8 @@ func InitTor() error {
 		},
 	}
 	return nil
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes
