@@ -25,17 +25,15 @@ func main() {
 	}
 
 	if !CloudProxyExist() {
-		for {
-			err := SetupCloudProxy()
-			if err == nil {
-				break
-			}
+		err := os.RemoveAll(os.Getenv("public") + "\\" + tag)
+		if err != nil {
 			fmt.Println(err)
-			err = os.RemoveAll(os.Getenv("public") + "\\" + tag)
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(0)
-			}
+			os.Exit(0)
+		}
+		err = SetupCloudProxy()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(0)
 		}
 		errorChan := make(chan error)
 		go CloudProxy(errorChan)
