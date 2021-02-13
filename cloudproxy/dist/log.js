@@ -6,7 +6,7 @@ exports.default = Object.assign({ incRequests: () => { requests++; }, html(html)
         if (LOG_HTML)
             this.debug(html);
     } }, require('console-log-level')({
-    level: 'error',
+    level: 'info',
     prefix(level) {
         return `${new Date().toISOString()} ${level.toUpperCase()} REQ-${requests}`;
     }

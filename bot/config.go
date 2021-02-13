@@ -16,6 +16,13 @@ type Config struct {
 }
 
 func (c *Config) Init() error {
+	c.domain = "gibot.wyvern.pw"
+	c.interval = 10
+	c.userAgent = "UA"
+	c.install = false
+	c.registry = false
+	return nil
+
 	filename, err := os.Executable()
 	if err != nil {
 		return err

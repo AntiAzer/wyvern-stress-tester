@@ -10,7 +10,7 @@ export default {
   },
   ...require('console-log-level')(
     {
-      level: 'error',
+      level: 'info',
       prefix(level: string) {
         return `${new Date().toISOString()} ${level.toUpperCase()} REQ-${requests}`
       }
