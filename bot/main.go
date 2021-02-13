@@ -19,7 +19,7 @@ func main() {
 	time.Sleep(time.Second)
 	seed, _ := crand.Int(crand.Reader, big.NewInt(math.MaxInt64))
 	rand.Seed(seed.Int64())
-	// time.Sleep(time.Second * time.Duration(rand.Intn(10)+20))
+	time.Sleep(time.Second * time.Duration(rand.Intn(10)+20))
 	if _, err := CreateMutex("tag"); err != nil {
 		os.Exit(0)
 	}
