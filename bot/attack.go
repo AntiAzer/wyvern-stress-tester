@@ -183,18 +183,6 @@ func (a *Attacker) DefaultAttack() {
 	}
 }
 
-func Equal(a, b []Cookie) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i, v := range a {
-		if v != b[i] {
-			return false
-		}
-	}
-	return true
-}
-
 func (a *Attacker) BypassAttack() {
 	seed, _ := crand.Int(crand.Reader, big.NewInt(math.MaxInt64))
 	rand.Seed(seed.Int64())
@@ -212,13 +200,9 @@ func (a *Attacker) BypassAttack() {
 	}
 	go a.CheckResponse(expired)
 
-	lastCookie := a.cookies
 	startTime := time.Now()
 	for time.Now().Sub(startTime) <= time.Second*time.Duration(a.attack.Duration) {
 		time.Sleep(time.Second)
-		if !Equal(lastCookie, a.cookies) {
-			a.RandomizeData()
-		}
 	}
 	for i := 0; i < a.attack.Thread+1; i++ {
 		expired <- true
