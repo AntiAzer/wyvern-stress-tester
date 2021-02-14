@@ -68,7 +68,7 @@ func (a *Attacker) SolveCookie() error {
 
 func (a *Attacker) RandomizeData() {
 	var randomizedData string
-	if len(strings.Split(a.attack.Data, "&")) > 0 {
+	if len(strings.Split(a.attack.Data, "&")) > 1 {
 		for i, data := range strings.Split(a.attack.Data, "&") {
 			if data == "" {
 				continue
