@@ -15,7 +15,7 @@ func GetCookies(url, customHeader, userAgent string) ([]Cookie, error) {
 
 	var solveJSON SolveJSON
 	solveJSON.Command = "request.get"
-	solveJSON.URL = strings.Split(url, "://")[0] + "://" + strings.Split(strings.Split(url, "://")[1], "/")[0]
+	solveJSON.URL = url
 	solveJSON.UserAgent = userAgent
 	solveJSON.SiteKey = splitedCustomHeader[0]
 	solveJSON.ApiKey = splitedCustomHeader[1]
