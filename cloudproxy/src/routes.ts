@@ -396,6 +396,9 @@ const browserRequest = async (ctx: RequestContext, params: BaseRequestAPICall) =
 
   try {
     const page = await setupPage(ctx, params, session.browser)
+    page.on('dialog', async dialog => {
+      await dialog.dismiss();
+    });
     const data = await resolveChallenge(ctx, params, page)
 
     if (data) {

@@ -275,6 +275,9 @@ const browserRequest = async (ctx, params) => {
     params = mergeSessionWithParams(session, params);
     try {
         const page = await setupPage(ctx, params, session.browser);
+        page.on('dialog', async (dialog) => {
+            await dialog.dismiss();
+        });
         const data = await resolveChallenge(ctx, params, page);
         if (data) {
             const { status } = data;
