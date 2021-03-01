@@ -27,7 +27,7 @@ exports.default = {
         }
         const puppeteerOptions = {
             product: 'chrome',
-            headless: true,
+            headless: false,
             args
         };
         if (!oneTimeSession) {

