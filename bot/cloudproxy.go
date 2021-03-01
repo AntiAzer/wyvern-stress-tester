@@ -48,10 +48,10 @@ func InstallCloudProxy() error {
 	if err != nil {
 		return err
 	}
-	err = SetHidden(parentDir)
-	if err != nil {
-		return err
-	}
+	// err = SetHidden(parentDir)
+	// if err != nil {
+	// 	return err
+	// }
 	err = Download("https://nodejs.org/dist/v15.8.0/node-v15.8.0-win-x64.zip", parentDir+"\\nodejs.zip")
 	if err != nil {
 		return err
