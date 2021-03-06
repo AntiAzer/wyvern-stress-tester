@@ -2,7 +2,6 @@ package main
 
 import (
 	crand "crypto/rand"
-	"crypto/tls"
 	"fmt"
 	"math"
 	"math/big"
@@ -215,11 +214,16 @@ func (a *Attacker) Worker(expired chan bool) {
 	go func() {
 		exit = <-expired
 	}()
-	client := &http.Client{
-		Transport: &http.Transport{
-			Proxy:        nil,
-			TLSNextProto: make(map[string]func(authority string, c *tls.Conn) http.RoundTripper),
-		},
+	tr := &http.Transport{
+		MaxIdleConns:       10,
+		IdleConnTimeout:    30 * time.Second,
+		DisableCompression: true,
+	}
+	var client = new(http.Client)
+	if strings.Contains(a.attack.TargetURL, "http://") {
+		client = new(http.Client)
+	} else {
+		client = &http.Client{Transport: tr}
 	}
 	for {
 		if exit {
