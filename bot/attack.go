@@ -3,6 +3,7 @@ package main
 import (
 	crand "crypto/rand"
 	"crypto/tls"
+	"fmt"
 	"math"
 	"math/big"
 	"math/rand"
@@ -226,6 +227,7 @@ func (a *Attacker) Worker(expired chan bool) {
 		}
 		request, err := a.BuildRequest()
 		if err != nil {
+			fmt.Println(err)
 			time.Sleep(time.Millisecond * time.Duration(a.attack.Interval))
 			continue
 		}

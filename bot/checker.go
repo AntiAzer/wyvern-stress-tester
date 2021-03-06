@@ -3,9 +3,10 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
-	"golang.org/x/net/html"
 	"io"
+	"io/ioutil"
 	"net/http"
+	"regexp"
 	"time"
 )
 
@@ -66,7 +67,7 @@ func (a *Attacker) CheckResponse(expired chan bool) {
 			r.Body.Close()
 			continue
 		}
-		fmt.Println(title)
+		fmt.Println(r.StatusCode, title)
 		if r.StatusCode == 403 {
 			a.SolveCookie()
 		} else if r.StatusCode == 503 {
@@ -83,29 +84,16 @@ func (a *Attacker) CheckResponse(expired chan bool) {
 	}
 }
 
-func IsTitleElement(n *html.Node) bool {
-	return n.Type == html.ElementNode && n.Data == "title"
-}
-
-func Traverse(n *html.Node) (string, bool) {
-	if IsTitleElement(n) {
-		return n.FirstChild.Data, true
-	}
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		result, ok := Traverse(c)
-		if ok {
-			return result, ok
-		}
-	}
-	return "", false
-}
-
 func GetHtmlTitle(r io.Reader) (string, error) {
-	doc, err := html.Parse(r)
+	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return "", err
 	}
-
-	title, _ := Traverse(doc)
-	return title, nil
+	regex, _ := regexp.Compile("<title>(.*)</title>")
+	res := regex.FindStringSubmatch(string(data))
+	if len(res) == 2 {
+		return res[1], nil
+	} else {
+		return "", nil
+	}
 }

@@ -64,7 +64,7 @@ export default {
 
     const puppeteerOptions: LaunchOptions = {
       product: 'chrome',
-      headless: true,
+      headless: false,
       args
     }
 
