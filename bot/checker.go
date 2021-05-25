@@ -1,12 +1,12 @@
 package main
 
 import (
-	"crypto/tls"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -18,6 +18,7 @@ func (a *Attacker) BuildCheckerRequest() (*http.Request, error) {
 		return nil, err
 	}
 	request.Header.Add("Connection", "keep-alive")
+	request.Header.Add("Cache-Control", "no-cache")
 	request.Header.Add("DNT", "1")
 	request.Header.Add("Upgrade-Insecure-Requests", "1")
 	request.Header.Add("User-Agent", a.userAgent)
@@ -40,11 +41,16 @@ func (a *Attacker) CheckResponse(expired chan bool) {
 	go func() {
 		exit = <-expired
 	}()
-	client := &http.Client{
-		Transport: &http.Transport{
-			Proxy:        nil,
-			TLSNextProto: make(map[string]func(authority string, c *tls.Conn) http.RoundTripper),
-		},
+	tr := &http.Transport{
+		MaxIdleConns:       10,
+		IdleConnTimeout:    30 * time.Second,
+		DisableCompression: true,
+	}
+	var client = new(http.Client)
+	if strings.Contains(a.attack.TargetURL, "http://") {
+		client = new(http.Client)
+	} else {
+		client = &http.Client{Transport: tr}
 	}
 	for {
 		if exit {

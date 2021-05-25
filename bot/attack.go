@@ -117,6 +117,7 @@ func (a *Attacker) BuildRequest() (*http.Request, error) {
 		request.Header.Add("DNT", "1")
 		request.Header.Add("Upgrade-Insecure-Requests", "1")
 	}
+	request.Header.Add("Cache-Control", "no-cache")
 	request.Header.Add("User-Agent", a.userAgent)
 	if a.attack.Method == "GET" {
 		if a.attack.Accept == "" && a.attack.AttackType == "bypass" {
@@ -237,6 +238,7 @@ func (a *Attacker) Worker(expired chan bool) {
 		}
 		r, err := client.Do(request)
 		if err == nil {
+			fmt.Println(r.Header)
 			r.Body.Close()
 		}
 		time.Sleep(time.Millisecond * time.Duration(a.attack.Interval))
